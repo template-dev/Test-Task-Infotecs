@@ -11,12 +11,13 @@ void BufferProcessor::InputData() {
         std::getline(std::cin, msg);
         if(msg.size() <= 64 && std::all_of(msg.begin(), msg.end(), ::isdigit)) {
             std::sort(msg.begin(), msg.end(), std::greater<char>());
-            for(auto& ch : msg) {
-                if((static_cast<int>(ch) & 1) == 0 ) {
-
-                    m_buffer.push(msg);
+            for(auto it = msg.begin(); it != msg.end(); ++it) {
+                if((static_cast<int>(*it) & 1) == 0 ) {
+                    *it = 'K';
+                    it = msg.insert(std::next(it), 'B');
                 }
             }
+            m_buffer.push(msg);
         }
     }
 }
