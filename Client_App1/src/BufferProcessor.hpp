@@ -4,6 +4,7 @@
 #include <queue>
 #include <string>
 #include <algorithm>
+#include <numeric>
 
 class BufferProcessor {
 public:

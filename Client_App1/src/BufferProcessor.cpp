@@ -1,9 +1,5 @@
 #include "BufferProcessor.hpp"
 
-BufferProcessor::BufferProcessor() {
-
-}
-
 void BufferProcessor::InputData() {
     while(true) {
         std::string msg;
@@ -23,5 +19,21 @@ void BufferProcessor::InputData() {
 }
 
 void BufferProcessor::OutputData() {
-
+    while(true) {
+        if(!m_buffer.empty()) {
+            std::string msg = m_buffer.front();
+            m_buffer.pop();
+            std::cout << "Data: " << msg << std::endl;
+            int count = std::accumulate(msg.begin(), msg.end(), 0, [](int acc, char c) {
+                if (std::isdigit(c)) {
+                    return ++acc;
+                }
+                return acc;
+            });
+        } else {
+            // Добавим паузу, чтобы избежать избыточного использования CPU
+            // Must change for multithreading
+            // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    }
 }
