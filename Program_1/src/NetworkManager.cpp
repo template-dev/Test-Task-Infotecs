@@ -27,23 +27,28 @@ bool NetworkManager::to_connect() noexcept {
 }
 
 bool NetworkManager::to_reconnect() noexcept {
-    return false;
+    to_disconnect();
+    to_connect();
+    std::cout << STATUS_TAG << "Reconnection to the server was successful.\n";
+    return true;
 }
 
 bool NetworkManager::to_disconnect() noexcept {
-    return false;
+    if(close(m_clientSocket) == -1) {
+        std::cerr << STATUS_TAG << "Failed to disconnect." << std::endl;
+        return false;
+    }
+    return true;
 }
 
 bool NetworkManager::to_send() noexcept {
-    return false;
+    return true;
 }
 
 bool NetworkManager::to_receive() noexcept {
-    return false;
+    return true;
 }
 
 NetworkManager::~NetworkManager() noexcept {
-    if(close(m_clientSocket) == -1) {
-        std::cerr << "Failed to close socket." << std::endl;
-    }
+    to_disconnect();
 }
