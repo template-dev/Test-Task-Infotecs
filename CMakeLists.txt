@@ -1,21 +1,19 @@
 cmake_minimum_required(VERSION 3.23 FATAL_ERROR)
 
 set(PROJECT_NAME "Infotecs")
+set(EXTERNAL_LIBS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external-libraries")
+
 project(${PROJECT_NAME})
 
-#include(${CMAKE_BINARY_DIR}/conan_toolchain.cmake)
+include(FetchContent)
 
-#cmake_policy(SET CMP0091 NEW)
-
-#include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-#conan_basic_setup()
-
-add_subdirectory(
-        ${CMAKE_CURRENT_SOURCE_DIR}/Client_App1
+FetchContent_Declare(json
+    GIT_REPOSITORY https://github.com/nlohmann/json
+    GIT_TAG v3.11.3
+    SOURCE_DIR ${EXTERNAL_LIBS_DIR}/json
 )
+FetchContent_MakeAvailable(json)
 
-#add_subdirectory(
-#        ${CMAKE_CURRENT_SOURCE_DIR}/Server_App2
-#)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Program_1)
 
-#target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Program_2)
