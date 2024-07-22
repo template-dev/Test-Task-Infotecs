@@ -11,8 +11,8 @@ public:
     void start();
 
 private:
-    void InputData();
-    void OutputData();
+    void inputData();
+    void outputData();
 
 private:
     std::queue<std::string> m_buffer;
