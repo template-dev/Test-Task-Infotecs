@@ -12,12 +12,12 @@
 
 class NetworkManager {
 public:
-    NetworkManager() noexcept;
+    NetworkManager(const char ip, int port) noexcept;
 
     bool to_connect() noexcept;
     bool to_reconnect() noexcept;
     bool to_disconnect() noexcept;
-    bool to_send(const std::string& message) noexcept;
+    bool to_send(int amount) noexcept;
     bool to_receive() noexcept;
 
     NetworkManager(const NetworkManager&) = delete;
@@ -32,4 +32,5 @@ private:
     int m_serverPort;
     int m_clientSocket;
     struct sockaddr_in m_serverAddr;
+    int m_amountOfAttempts;
 };

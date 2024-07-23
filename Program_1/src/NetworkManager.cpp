@@ -1,10 +1,11 @@
 #include "NetworkManager.hpp"
 
-NetworkManager::NetworkManager() noexcept
-    : m_serverIp{"127.0.0.1"}
-    , m_serverPort{1234}
+NetworkManager::NetworkManager(const char* ip, int port) noexcept
+    : m_serverIp{ip}
+    , m_serverPort{port}
     , m_clientSocket{0}
     , m_serverAddr{}
+    , m_amountOfAttempts{3}
 {
     m_clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (m_clientSocket != -1) {
@@ -14,6 +15,7 @@ NetworkManager::NetworkManager() noexcept
     } else {
         std::cerr << STATUS_TAG << "Socket creation error.\n";
     }
+    to_connect();
 }
 
 bool NetworkManager::to_connect() noexcept {
@@ -27,8 +29,16 @@ bool NetworkManager::to_connect() noexcept {
 }
 
 bool NetworkManager::to_reconnect() noexcept {
-    to_disconnect();
-    to_connect();
+    std::cout << "Number of connection attempts: " << m_amountOfAttempts;
+    while(m_amountOfAttempts > 0) {
+        if(!to_disconnect()) {
+            return false;
+        }
+        if(!to_connect()) {
+            --m_amountOfAttempts;
+            std::cout << "I couldn't connect. Attempts: " << m_amountOfAttempts;
+        }
+    }
     std::cout << STATUS_TAG << "Reconnection to the server was successful.\n";
     return true;
 }
@@ -41,8 +51,8 @@ bool NetworkManager::to_disconnect() noexcept {
     return true;
 }
 
-bool NetworkManager::to_send(const std::string& message) noexcept {
-    if (send(m_clientSocket, message.c_str(), message.size(), 0) == -1) {
+bool NetworkManager::to_send(int amount) noexcept {
+    if (send(m_clientSocket, &amount, sizeof(amount), 0) == -1) {
         std::cerr << STATUS_TAG << "Error sending data to the server.\n";
         return false;
     }

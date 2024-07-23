@@ -5,15 +5,23 @@
 #include <string>
 #include <algorithm>
 #include <numeric>
+#include <memory>
+#include <mutex>
+#include <condition_variable>
+#include "NetworkManager.hpp"
 
 class BufferProcessor {
 public:
-    void start();
+    BufferProcessor();
+    ~BufferProcessor();
 
-private:
     void inputData();
     void outputData();
 
 private:
-    std::queue<std::string> m_buffer;
+    std::string m_buffer;
+    std::unique_ptr<NetworkManager> m_networkManager;
+    bool m_isDataReceived;
+    std::mutex m_mutex;
+    std::condition_variable m_cv;
 };

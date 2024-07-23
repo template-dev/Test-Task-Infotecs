@@ -1,37 +1,49 @@
 #include "BufferProcessor.hpp"
 
-void BufferProcessor::start() {
-    inputData();
-}
+BufferProcessor::BufferProcessor()
+    : m_buffer{}
+    //, m_networkManager{std::make_unique<NetworkManager>("127.0.0.1", 1234)}
+    , m_isDataReceived{false}
+    , m_mutex{}
+    , m_cv{}
+{}
 
 void BufferProcessor::inputData() {
+    /*std::unique_ptr<NetworkManager> m_networkManager;
+    if(!m_networkManager->to_connect()) {
+        m_networkManager->to_reconnect();
+    }*/
     while(true) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         std::string msg;
         std::cout << "Enter a message, please: ";
         std::getline(std::cin, msg);
-        if(msg.size() <= 64 && std::all_of(msg.begin(), msg.end(), ::isdigit)) {
+        if(!msg.empty() && msg.length() <= 64 && std::all_of(msg.begin(), msg.end(), ::isdigit)) {
             std::sort(msg.begin(), msg.end(), std::greater<char>());
-            for(auto it = msg.begin(); it != msg.end(); ++it) {
-                if (isdigit(*it)) {
-                    int digit = *it - '0';
-                    if ((digit & 1) == 0) {
-                        *it = 'K';
-                        it = msg.insert(std::next(it), 'B');
-                        ++it;
-                    }
+            std::string newString;
+            for(const char& ch : msg) {
+                if((ch & 1) == 0) {
+                    newString += "KB";
+                }
+                else {
+                    newString += ch;
                 }
             }
-            std::cout << msg << std::endl;
-            m_buffer.push(msg);
+            std::cout << newString << std::endl;
+            m_buffer = newString;
+            m_cv.notify_all();
         }
     }
 }
 
 void BufferProcessor::outputData() {
     while(true) {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        m_cv.wait(lock, [this] { return m_isDataReceived; });
         if(!m_buffer.empty()) {
-            std::string msg = m_buffer.front();
-            m_buffer.pop();
+            std::string msg = m_buffer;
+            m_buffer  = "";
+            lock.unlock();
             std::cout << "Data: " << msg << std::endl;
             int count = std::accumulate(msg.begin(), msg.end(), 0, [](int acc, char c) {
                 if (std::isdigit(c)) {
@@ -39,10 +51,13 @@ void BufferProcessor::outputData() {
                 }
                 return acc;
             });
-        } else {
-            // Добавим паузу, чтобы избежать избыточного использования CPU
-            // Must change for multithreading
-            // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::cout << "Count: " << count << std::endl;
+            //m_networkManager->to_send(count);
         }
     }
+}
+
+BufferProcessor::~BufferProcessor() {
+    m_isDataReceived = true;
+    m_cv.notify_all();
 }
