@@ -41,11 +41,26 @@ bool NetworkManager::to_disconnect() noexcept {
     return true;
 }
 
-bool NetworkManager::to_send() noexcept {
+bool NetworkManager::to_send(const std::string& message) noexcept {
+    if (send(m_clientSocket, message.c_str(), message.size(), 0) == -1) {
+        std::cerr << STATUS_TAG << "Error sending data to the server.\n";
+        return false;
+    }
     return true;
 }
 
 bool NetworkManager::to_receive() noexcept {
+    std::vector<char> buffer(1024);
+    int bytesReceived = recv(m_clientSocket, buffer.data(), buffer.size(), 0);
+    if (bytesReceived == -1) {
+        std::cerr << STATUS_TAG << "Error when receiving data from the server.\n";
+        return false;
+    } else if (bytesReceived == 0) {
+        std::cout << STATUS_TAG << "The server has shut down.\n";
+        return false;
+    }
+    std::string message(buffer.begin(), buffer.begin() + bytesReceived);
+    // continue
     return true;
 }
 

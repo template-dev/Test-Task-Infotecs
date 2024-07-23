@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -16,7 +17,7 @@ public:
     bool to_connect() noexcept;
     bool to_reconnect() noexcept;
     bool to_disconnect() noexcept;
-    bool to_send() noexcept;
+    bool to_send(const std::string& message) noexcept;
     bool to_receive() noexcept;
 
     NetworkManager(const NetworkManager&) = delete;
