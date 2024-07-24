@@ -7,21 +7,26 @@
 #include <numeric>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include <condition_variable>
 #include "NetworkManager.hpp"
 
-class BufferProcessor {
+class DataProcessor {
 public:
-    BufferProcessor();
-    ~BufferProcessor();
+    DataProcessor();
+    DataProcessor(const DataProcessor&) = delete;
+    DataProcessor(DataProcessor&&) = delete;
+    DataProcessor& operator=(const DataProcessor&) = delete;
+    DataProcessor& operator=(DataProcessor&&) = delete;
+    ~DataProcessor();
 
     void inputData();
     void outputData();
 
 private:
-    std::string m_buffer;
     std::unique_ptr<NetworkManager> m_networkManager;
     bool m_isDataReceived;
     std::mutex m_mutex;
     std::condition_variable m_cv;
+    std::string m_buffer;
 };

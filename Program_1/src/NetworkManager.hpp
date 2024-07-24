@@ -7,18 +7,19 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <chrono>
+#include <thread>
 
 #define STATUS_TAG "[STATUS]: "
 
 class NetworkManager {
 public:
-    NetworkManager(const char ip, int port) noexcept;
+    NetworkManager(const char* ip, int port) noexcept;
 
-    bool to_connect() noexcept;
-    bool to_reconnect() noexcept;
-    bool to_disconnect() noexcept;
-    bool to_send(int amount) noexcept;
-    bool to_receive() noexcept;
+    bool to_connect();
+    bool to_reconnect();
+    bool to_disconnect();
+    bool to_send(const std::string& data);
 
     NetworkManager(const NetworkManager&) = delete;
     NetworkManager(NetworkManager&&) = delete;
@@ -28,9 +29,9 @@ public:
     ~NetworkManager() noexcept;
 
 private:
-    const char* m_serverIp;
-    int m_serverPort;
-    int m_clientSocket;
+    const char* m_ip;
+    int m_port;
+    int m_socket;
     struct sockaddr_in m_serverAddr;
     int m_amountOfAttempts;
 };

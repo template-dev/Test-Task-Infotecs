@@ -1,20 +1,15 @@
-#include "BufferProcessor.hpp"
+#include "DataProcessor.hpp"
 
-BufferProcessor::BufferProcessor()
-    : m_buffer{}
-    //, m_networkManager{std::make_unique<NetworkManager>("127.0.0.1", 1234)}
+DataProcessor::DataProcessor()
+    : m_networkManager{std::make_unique<NetworkManager>("127.0.0.1", 1234)}
+    , m_buffer{}
     , m_isDataReceived{false}
     , m_mutex{}
     , m_cv{}
 {}
 
-void BufferProcessor::inputData() {
-    /*std::unique_ptr<NetworkManager> m_networkManager;
-    if(!m_networkManager->to_connect()) {
-        m_networkManager->to_reconnect();
-    }*/
+void DataProcessor::inputData() {
     while(true) {
-        std::lock_guard<std::mutex> lock(m_mutex);
         std::string msg;
         std::cout << "Enter a message, please: ";
         std::getline(std::cin, msg);
@@ -29,22 +24,25 @@ void BufferProcessor::inputData() {
                     newString += ch;
                 }
             }
-            std::cout << newString << std::endl;
+            std::unique_lock<std::mutex> lock(m_mutex);
+            std::cout << "Message: " << newString << std::endl;
             m_buffer = newString;
+            m_isDataReceived = true;
             m_cv.notify_all();
         }
     }
 }
 
-void BufferProcessor::outputData() {
+void DataProcessor::outputData() {
     while(true) {
         std::unique_lock<std::mutex> lock(m_mutex);
         m_cv.wait(lock, [this] { return m_isDataReceived; });
         if(!m_buffer.empty()) {
             std::string msg = m_buffer;
             m_buffer  = "";
-            lock.unlock();
+            m_isDataReceived = true;
             std::cout << "Data: " << msg << std::endl;
+            lock.unlock();
             int count = std::accumulate(msg.begin(), msg.end(), 0, [](int acc, char c) {
                 if (std::isdigit(c)) {
                     return ++acc;
@@ -52,12 +50,12 @@ void BufferProcessor::outputData() {
                 return acc;
             });
             std::cout << "Count: " << count << std::endl;
-            //m_networkManager->to_send(count);
+            m_networkManager->to_send(std::to_string(count));
         }
     }
 }
 
-BufferProcessor::~BufferProcessor() {
+DataProcessor::~DataProcessor() {
     m_isDataReceived = true;
     m_cv.notify_all();
 }
