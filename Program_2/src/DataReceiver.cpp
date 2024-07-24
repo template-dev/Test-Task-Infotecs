@@ -75,9 +75,9 @@ void DataReceiver::handleClient(int clientSocket, const sockaddr_in& clientAddr)
         }
         std::string data(buffer, bytesReceived);
         std::cout << STATUS_TAG << "A message has been received from the client [" << inet_ntoa(clientAddr.sin_addr) << "]:[" << ntohs(clientAddr.sin_port) << "]" << std::endl;
+        std::cout << STATUS_TAG << "Received data: " << data << std::endl;
         int number = std::stoll(data);
-        std::cout << "DATA: " << number << std::endl;
-        if (data.length() > 2 && number % 32 == 0) {
+        if (data.length() >= 2 && number % 32 == 0) {
             std::cout << STATUS_TAG << "Received valid data: " << data << std::endl;
         } else {
             std::cerr << STATUS_TAG << "Error: Invalid data length or format!" << std::endl;

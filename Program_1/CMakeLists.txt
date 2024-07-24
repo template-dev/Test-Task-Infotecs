@@ -21,9 +21,3 @@ set_target_properties(
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
-
-#target_link_libraries(
-#  ${PROJECT_NAME}
-#  PRIVATE
-# nlohmann_json::nlohmann_json
-#)
