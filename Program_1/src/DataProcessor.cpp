@@ -1,12 +1,14 @@
 #include "DataProcessor.hpp"
 
 DataProcessor::DataProcessor()
-    : m_networkManager{std::make_unique<NetworkManager>("127.0.0.1", 1234)}
+    : m_networkManager{std::make_unique<NetworkManager>("127.0.0.1", 12345)}
     , m_buffer{}
     , m_isDataReceived{false}
     , m_mutex{}
     , m_cv{}
-{}
+{
+    m_networkManager->to_connect();
+}
 
 void DataProcessor::inputData() {
     while(true) {
@@ -40,7 +42,7 @@ void DataProcessor::outputData() {
         if(!m_buffer.empty()) {
             std::string msg = m_buffer;
             m_buffer  = "";
-            m_isDataReceived = true;
+            m_isDataReceived = false;
             std::cout << "Data: " << msg << std::endl;
             lock.unlock();
             int count = std::accumulate(msg.begin(), msg.end(), 0, [](int acc, char c) {
@@ -58,4 +60,5 @@ void DataProcessor::outputData() {
 DataProcessor::~DataProcessor() {
     m_isDataReceived = true;
     m_cv.notify_all();
+    m_networkManager->to_disconnect();
 }

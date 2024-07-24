@@ -1,15 +1,10 @@
 #include "DataReceiver.hpp"
 
 DataReceiver::DataReceiver() noexcept
-    : m_port{1234}
+    : m_port{12345}
     , m_socket{-1}
     , m_addr{}
-    , m_dataProcessor{std::make_unique<DataProcessor>()}
 {
-    to_start();
-}
-
-void DataReceiver::to_start() {
     to_createAndBind();
     to_listen();
 }
@@ -78,9 +73,15 @@ void DataReceiver::handleClient(int clientSocket, const sockaddr_in& clientAddr)
             close(clientSocket);
             break;
         }
-        std::cout << STATUS_TAG << "A message has been received from the client [" << inet_ntoa(clientAddr.sin_addr) << "]:[" << ntohs(clientAddr.sin_port) << "]: " << std::string(buffer, bytesReceived) << std::endl;
         std::string data(buffer, bytesReceived);
-        //m_dataProcessor->processData(data);
+        std::cout << STATUS_TAG << "A message has been received from the client [" << inet_ntoa(clientAddr.sin_addr) << "]:[" << ntohs(clientAddr.sin_port) << "]" << std::endl;
+        int number = std::stoll(data);
+        std::cout << "DATA: " << number << std::endl;
+        if (data.length() > 2 && number % 32 == 0) {
+            std::cout << STATUS_TAG << "Received valid data: " << data << std::endl;
+        } else {
+            std::cerr << STATUS_TAG << "Error: Invalid data length or format!" << std::endl;
+        }
     }
 }
 

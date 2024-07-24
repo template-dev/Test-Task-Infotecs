@@ -9,7 +9,6 @@
 #include <arpa/inet.h>
 #include <thread>
 #include <memory>
-#include "DataProcessor.hpp"
 
 #define STATUS_TAG "[STATUS]: "
 
@@ -22,8 +21,6 @@ public:
     DataReceiver& operator=(const DataReceiver&) = delete;
     DataReceiver& operator=(DataReceiver&&) = delete;
 
-    void to_start();
-
     ~DataReceiver() noexcept;
 
 private:
@@ -35,5 +32,4 @@ private:
     int m_port;
     int m_socket;
     struct sockaddr_in m_addr;
-    std::unique_ptr<DataProcessor> m_dataProcessor;
 };

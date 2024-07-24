@@ -46,6 +46,7 @@ bool NetworkManager::to_disconnect() {
         std::cerr << STATUS_TAG << "Failed to disconnect." << std::endl;
         return false;
     }
+    m_socket = -1;
     return true;
 }
 
@@ -58,5 +59,7 @@ bool NetworkManager::to_send(const std::string& data) {
 }
 
 NetworkManager::~NetworkManager() noexcept {
-    to_disconnect();
+    if (m_socket != -1) {
+        to_disconnect();
+    }
 }

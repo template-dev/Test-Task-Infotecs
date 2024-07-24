@@ -7,10 +7,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_executable(
     ${PROJECT_NAME}
-    src/DataProcessor.hpp
     src/DataReceiver.hpp
     main.cpp
-    src/DataProcessor.cpp
     src/DataReceiver.cpp
 )
 
